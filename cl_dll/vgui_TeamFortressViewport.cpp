@@ -1354,19 +1354,29 @@ void TeamFortressViewport::UpdateSpectatorPanel()
 			pBottomText = CHudTextMessage::BufferedLocaliseTextString(bottomText);
 		}
 
+		bool useTeamColor = false;
+
 		// in first person mode colorize player names
 		if ((g_iUser1 == OBS_IN_EYE) && 0 != player)
 		{
 			float* color = GetClientColor(player);
-			int r = color[0] * 255;
-			int g = color[1] * 255;
-			int b = color[2] * 255;
 
-			// set team color, a bit transparent
-			m_pSpectatorPanel->m_BottomMainLabel->setFgColor(r, g, b, 0);
-			m_pSpectatorPanel->m_BottomMainButton->setFgColor(r, g, b, 0);
+			//Color is null in CTF.
+			if (color)
+			{
+				int r = color[0] * 255;
+				int g = color[1] * 255;
+				int b = color[2] * 255;
+
+				// set team color, a bit transparent
+				m_pSpectatorPanel->m_BottomMainLabel->setFgColor(r, g, b, 0);
+				m_pSpectatorPanel->m_BottomMainButton->setFgColor(r, g, b, 0);
+
+				useTeamColor = true;
+			}
 		}
-		else
+
+		if (!useTeamColor)
 		{ // restore GUI color
 			m_pSpectatorPanel->m_BottomMainLabel->setFgColor(143, 143, 54, 0);
 			m_pSpectatorPanel->m_BottomMainButton->setFgColor(143, 143, 54, 0);
@@ -1576,12 +1586,14 @@ void TeamFortressViewport::ShowVGUIMenu(int iMenu)
 	if (0 != gEngfuncs.pDemoAPI->IsPlayingback())
 		return;
 
+	/*
 	// Don't open any menus except the MOTD or stats menu during intermission
 	// MOTD needs to be accepted because it's sent down to the client
 	// after map change, before intermission's turned off
 	// Stats menu is displayed during intermission.
 	if (gHUD.m_iIntermission && (iMenu != MENU_INTRO && iMenu != MENU_STATSMENU))
 		return;
+	*/
 
 	// Don't create one if it's already in the list
 	if (m_pCurrentMenu)
